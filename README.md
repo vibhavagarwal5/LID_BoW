@@ -4,6 +4,8 @@
 
 Use the following command to download the dataset that I used for this task.
 
+Create a `/data` in the root folder of this project and run the following inside `/data`.
+
 ```
 wget https://downloads.tatoeba.org/exports/sentences.csv
 ```
