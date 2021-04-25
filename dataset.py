@@ -61,7 +61,7 @@ class BoWDataset(Dataset):
 
     def create_feats(self, idx):
         X = self.vectorizer.fit_transform([self.data['text'][idx]]).toarray()
-        X = (X - X.min()) / (X.max() - X.min())
+        # X = (X - X.min()) / (X.max() - X.min())
 
         y = lang2id[self.data['lang'][idx]]
         return X, y
@@ -71,6 +71,17 @@ class BoWDataset(Dataset):
 
     def __getitem__(self, index):
         X, y = self.create_feats(index)
+        return X, y
+
+
+class Collatefn:
+    def __call__(self, batch):
+        X = [i[0] for i in batch]
+        X = np.array(X)
+        X = (X - X.min()) / (X.max() - X.min())
+
+        y = [i[1] for i in batch]
+
         X = torch.tensor(X).float()
         y = torch.tensor(y).long()
         return X, y
@@ -109,9 +120,10 @@ if __name__ == '__main__':
         '''Testing'''
         from torch.utils.data import DataLoader
 
-        dataset = BoWDataset('train', './data', None)
+        dataset = BoWDataset('train', args.data_path, None)
         dataloader = DataLoader(dataset,
-                                batch_size=4)
+                                batch_size=4,
+                                collate_fn=Collatefn(), shuffle=True)
 
         batch = next(iter(dataloader))
         X, y = batch
